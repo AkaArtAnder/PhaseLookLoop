@@ -1,0 +1,11 @@
+#run pybind
+python setup.py build_ext -i
+
+#run qtform
+/home/art_ander/anaconda3/bin/pyuic5 name.ui -o name.py
+
+#Errors PyQt5
+make file : .pylintrc
+text: extension-pkg-whitelist=PyQt5
+
+i*(coef*r*x - 0.5*coef*r*x**2/t_const) + 6.28318530717959*omega0*x + phase + x*(coef*i*r*x/t_const + y) + x_input - 6.28318530717959 - фильтр 1-го порядка
