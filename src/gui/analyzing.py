@@ -4,6 +4,7 @@ import seaborn as sb
 import matplotlib.pyplot as plt
 import pyqtgraph as pg
 import numpy as np
+from scipy.stats import chi2
 from PyQt5.QtWidgets import QWidget, QGridLayout, QGroupBox, QLabel, QVBoxLayout, QComboBox, QPushButton, QHBoxLayout
 
 frequency_input_signal: float
@@ -170,11 +171,14 @@ class PrintStatistic(QWidget):
 
             _mean = sum(_part_array)/len(_part_array)
             _std = sqrt(sum(map(lambda arr: (arr - _mean)**2, _part_array))/(len(_part_array) - 1))
+
             _std_mean = _std/sqrt(len(_part_array))
             _error_mean = 1.96 * _std_mean
 
+            _error_std = [_std * sqrt((len(_part_array)-1))/sqrt(chi2.ppf(0.975, (len(_part_array)-1))), _std * sqrt((len(_part_array)-1))/sqrt(chi2.ppf(0.025, (len(_part_array)-1)))]
+
             self.result_data[key]['mean'] = [_mean, _error_mean]
-            self.result_data[key]['std'] = _std
+            self.result_data[key]['std'] = _error_std
     
     def create_data_graph_array(self):
         self.data_statistic = {
@@ -190,7 +194,7 @@ class PrintStatistic(QWidget):
             self.data_statistic['information'].append(value['information'])
             self.data_statistic['mean'].append(value['mean'][0])
             self.data_statistic['error'].append(value['mean'][1])
-            self.data_statistic['std'].append(value['std'])
+            self.data_statistic['std'].append((value['std'][0] + value['std'][1])/2)
             self.data_statistic['param'].append(float(value['value_param']))
         
 
@@ -199,7 +203,7 @@ class PrintStatistic(QWidget):
 
         result_paramLabel = QLabel("Value parameter")
         result_meanLabel = QLabel("    Mean")
-        result_stdLabel = QLabel("Std")
+        result_stdLabel = QLabel(" Std")
 
         resultLayout = QGridLayout()
         resultLayout.addWidget(result_paramLabel, 0, 0)
@@ -210,7 +214,7 @@ class PrintStatistic(QWidget):
         for key, value in self.result_data.items():
             _inf = str(value['information'])
             _mean = "    (" + str(value['mean'][0]) + " +/- " + str(value['mean'][1]) + ")    "
-            _std = str(value['std'])
+            _std = "(" + str(value['std'][0]) + " ; " + str(value['std'][1]) + ")"
 
             _paramLabel = QLabel(_inf)
             _meanLabel = QLabel(_mean)
@@ -236,6 +240,7 @@ class PrintStatistic(QWidget):
         histLayout.addWidget(self.result_histButton)
         self.histGroupBox.setLayout(histLayout)
 
+
 class PlotDataStatistic(pg.GraphicsLayoutWidget):
     def __init__(self, result_data, parent=None):
         pg.GraphicsLayoutWidget.__init__(self, parent)
@@ -256,6 +261,7 @@ class PlotDataStatistic(pg.GraphicsLayoutWidget):
         p1.plot(np.array(self.result_data['param'], dtype=float), np.array(self.result_data['mean'], dtype=float), symbol='o', pen={'color': 0.8, 'width': 2})
         p1.showGrid(x=True, y=True)
         p1.setLabel('left', 'Value Mx')
+        p1.setLabel('bottom', 'Parameter ' + self.result_data['information'][0][0])
 
         self.nextRow()
 
@@ -263,6 +269,7 @@ class PlotDataStatistic(pg.GraphicsLayoutWidget):
         p2.plot(np.array(self.result_data['param'], dtype=float), np.array(self.result_data['std'], dtype=float), symbol='o', pen={'color': 0.8, 'width': 2})
         p2.showGrid(x=True, y=True)
         p2.setLabel('left', 'Value Std')
+        p2.setLabel('bottom', 'Parameter ' + self.result_data['information'][0][0])
 
         self.nextRow()
 

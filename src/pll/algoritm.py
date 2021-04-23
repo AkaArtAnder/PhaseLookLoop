@@ -179,7 +179,9 @@ def main_algoritm(initial_data: dict, self: object) -> dict:
                             if phase_generator_on_step_synchronization < 2 * pi:
                                 # step 16
                                 matrix_x = matrix_g * 0
+                                #matrix_x = matrix_g
                                 phase[_count + 1] = abs(phase_generator_on_step_synchronization)
+                                #phase[_count + 1] = phase_generator_on_step_synchronization % 2*pi
                                 _count += 1
                                 break
                             else:
@@ -210,6 +212,7 @@ def main_algoritm(initial_data: dict, self: object) -> dict:
                     else:
                         matrix_x = matrix_g
                         phase[_count + 1] = abs(phase_generator_on_step_synchronization)
+                        #phase[_count + 1] = phase_generator_on_step_synchronization % 2*pi
                         _count += 1
                 # step 6
                 else:
@@ -273,6 +276,7 @@ def main_algoritm(initial_data: dict, self: object) -> dict:
                             # step 25
                             matrix_x = matrix_g
                             phase[_count + 1] = abs(phase_generator_on_step_synchronization)
+                            #phase[_count + 1] = phase_generator_on_step_synchronization % 2*pi
                             _count += 1
                             break
                         else:
@@ -303,6 +307,7 @@ def main_algoritm(initial_data: dict, self: object) -> dict:
                 # step 19
                 else:
                     matrix_x = matrix_g * 0
+                    #matrix_x = matrix_g
                     phase[_count + 1] = phase_generator_on_period[_count]
                     _count += 1
         except IndexError:
